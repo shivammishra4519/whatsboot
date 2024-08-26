@@ -22,7 +22,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 // app.use(cors());
 app.use(cors({
-    origin: 'http://localhost:4200', // Your Angular app URL
+    origin: '*', // Your Angular app URL
     credentials: true // Allow cookies to be sent and received
   }));
 app.use('/user',users);
