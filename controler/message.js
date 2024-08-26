@@ -72,39 +72,6 @@ const incomingMessages=async(req,res)=>{
 
 
 
-const deleteFolder = async (req,res) => {
-    try {
-       
-        const authHeader = req.header('Authorization');
-        const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
-
-        if (!token) {
-            return res.status(401).json({ message: 'Access denied. No token provided.' });
-        }
-
-        // Verify the token
-        const secretKey = process.env.JWT_SECRET || 'whatsapp'; // Use an environment variable for the secret key
-        let decoded;
-        try {
-            decoded = jwt.verify(token, secretKey);
-        } catch (err) {
-            console.log(err);
-            return res.status(400).json({ message: 'Invalid token.' });
-        }
-        const sessionId=decoded.number;
-        const folderPath = path.join(__dirname, 'sessions', sessionId);
-
-        // Remove the folder and its contents
-        await fs.rm(folderPath, { recursive: true, force: true });
-res.status(200).json({message:"Folder deleted successfully"})
-        console.log(`Folder deleted successfully: ${folderPath}`);
-    } catch (error) {
-        console.error(`Error deleting folder:1 ${error}`);
-    }
-};
-
-// Execute the function to delete the folder
-// deleteFolder();
 
 
-module.exports={sendedMessage,incomingMessages,deleteFolder}
+module.exports={sendedMessage,incomingMessages}
