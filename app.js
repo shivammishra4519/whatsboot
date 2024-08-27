@@ -16,13 +16,13 @@ connectToDB()
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-const server = http.createServer(app);
+// const server = http.createServer(app);
 
 // Initialize Socket.IO on the server
-const io = socketIo(server);
+// const io = socketIo(server);
 // app.use(cors());
 app.use(cors({
-    origin: 'http://62.72.56.135/', // Your Angular app URL
+    origin: '*', // Your Angular app URL
     credentials: true // Allow cookies to be sent and received
   }));
 app.use('/user',users);
@@ -45,13 +45,13 @@ app.get('/current-user', verifyToken, (req, res) => {
   }
 });
 
-io.on('connection', (socket) => {
-  console.log('A user connected');
+// io.on('connection', (socket) => {
+//   console.log('A user connected');
 
-  socket.on('disconnect', () => {
-      console.log('User disconnected');
-  });
-});
+//   socket.on('disconnect', () => {
+//       console.log('User disconnected');
+//   });
+// });
 const port = process.env.PORT || 3260;
 app.listen(port,()=>{
     console.log(`App is runing on port number : ${port}`)
