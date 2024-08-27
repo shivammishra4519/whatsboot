@@ -11,6 +11,10 @@ const cookieParser = require('cookie-parser');
 const socketIo = require('socket.io');
 const message=require('./route/messageRoute')
 const http = require('http');
+require('dotenv').config();
+
+
+
 const app=express();
 connectToDB()
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,8 +25,9 @@ app.use(cookieParser());
 // Initialize Socket.IO on the server
 // const io = socketIo(server);
 // app.use(cors());
+
 app.use(cors({
-    origin: 'http://62.72.56.135', // Your Angular app URL
+    origin: process.env.ORIGIN, // Your Angular app URL
     credentials: true // Allow cookies to be sent and received
   }));
 app.use('/user',users);
