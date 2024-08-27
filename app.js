@@ -22,7 +22,7 @@ app.use(cookieParser());
 // const io = socketIo(server);
 // app.use(cors());
 app.use(cors({
-    origin: '*', // Your Angular app URL
+    origin: 'http://62.72.56.135', // Your Angular app URL
     credentials: true // Allow cookies to be sent and received
   }));
 app.use('/user',users);
@@ -58,4 +58,4 @@ app.listen(port,()=>{
 })
 
 
-module.exports = { io };
+// module.exports = { io };
