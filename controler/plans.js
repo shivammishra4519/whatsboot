@@ -199,8 +199,8 @@ const verifyPayment = async (req, res) => {
         if (!result) {
             return res.status(400).json({ message: 'No Payment Request' });
         }
-        if(result.status == 'success'){
-            return res.status(400).json({message:"Payment All Ready Procced"});
+        if (result.status == 'success') {
+            return res.status(400).json({ message: "Payment All Ready Procced" });
         }
         const response = await checkOrderStatus(order_id, user_token);
         if (response.status !== 'COMPLETED') {
@@ -208,6 +208,15 @@ const verifyPayment = async (req, res) => {
         }
 
         const soldPlanCollection = db.collection('soldPlans');
+        const username=decoded.number
+        const existingPlan = await soldPlanCollection.findOne({
+           
+            'plans.utr': response.result.utr,
+        });
+    
+        if (existingPlan) {
+            return res.status(400).json({ message: 'UTR number already used.' });
+        }
         await soldPlanCollection.updateOne(
             { username }, // Find the document by username
             { $push: { plans: { planId: result.remark1, utr: response.result.utr, timestamp: new Date() } } }, // Add the message object to the existing messages array
@@ -217,7 +226,7 @@ const verifyPayment = async (req, res) => {
         await onlinePaymentCollection.updateOne(
             { order_id }, // Filter to find the document with the given order_id
             {
-                $set: { status: "success" ,utr:response.result.utr} // Update the status field to "success"
+                $set: { status: "success", utr: response.result.utr } // Update the status field to "success"
             }
         );
 
@@ -247,4 +256,35 @@ async function checkOrderStatus(order_id, user_token) {
     }
 }
 
-module.exports = { addPlan, getAllPlan, buyPlan,verifyPayment };
+const deletePlan = async (req, res) => {
+    try {
+        const authHeader = req.header('Authorization');
+        const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
+
+        if (!token) {
+            return res.status(401).json({ message: 'Access denied. No token provided.' });
+        }
+
+        // Verify the token
+        const secretKey = process.env.JWT_SECRET || 'whatsapp'; // Use an environment variable for the secret key
+        let decoded;
+        try {
+            decoded = jwt.verify(token, secretKey);
+        } catch (err) {
+            return res.status(400).json({ message: 'Invalid token.' });
+        }
+
+        const db = getDB();
+        const collection = db.collection('plans');
+        const id = req.body;
+      
+        const _id = new ObjectId(id);
+        const result = await collection.deleteOne({ _id });
+        res.status(200).json({ message: "Plan Deleted Successfully" });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "internal serverv error" })
+    }
+}
+
+module.exports = { addPlan, getAllPlan, buyPlan, verifyPayment,deletePlan };

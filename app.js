@@ -9,7 +9,8 @@ const verifyToken=require('./midleware/verifytoken');
 const plans=require('./route/plansRoute')
 const cookieParser = require('cookie-parser');
 const socketIo = require('socket.io');
-const message=require('./route/messageRoute')
+const message=require('./route/messageRoute');
+const payment=require('./route/paymentRoute')
 const http = require('http');
 require('dotenv').config();
 
@@ -34,6 +35,7 @@ app.use('/user',users);
 app.use('/whatsapp',whatsapp);
 app.use('/plan',plans);
 app.use('/message',message)
+app.use('/payment',payment)
  
 app.get('/',(req,res)=>{
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
