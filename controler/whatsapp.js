@@ -57,7 +57,9 @@ const loginWhatsapp = async (req, res) => {
             authStrategy: new LocalAuth({
                 clientId: sessionId,
                 dataPath: sessionPath,
-            }),
+            }), puppeteer: {
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            },
         });
 
         client.on('qr', async (qr) => {
