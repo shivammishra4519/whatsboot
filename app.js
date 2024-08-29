@@ -10,7 +10,8 @@ const plans=require('./route/plansRoute')
 const cookieParser = require('cookie-parser');
 const socketIo = require('socket.io');
 const message=require('./route/messageRoute');
-const payment=require('./route/paymentRoute')
+const payment=require('./route/paymentRoute');
+const ip=require('./route/ipRoute')
 const http = require('http');
 require('dotenv').config();
 
@@ -36,6 +37,7 @@ app.use('/whatsapp',whatsapp);
 app.use('/plan',plans);
 app.use('/message',message)
 app.use('/payment',payment)
+app.use('/ip',ip)
  
 app.get('/',(req,res)=>{
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;

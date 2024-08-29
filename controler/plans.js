@@ -208,18 +208,21 @@ const verifyPayment = async (req, res) => {
         }
 
         const soldPlanCollection = db.collection('soldPlans');
-        const username=decoded.number
+        const username = decoded.number
         const existingPlan = await soldPlanCollection.findOne({
-           
+
             'plans.utr': response.result.utr,
         });
-    
+        const planCollection = db.collection('plans');
+        const _id = new ObjectId(result.remark1);
+        const plan=await planCollection.findOne({_id} );
+
         if (existingPlan) {
             return res.status(400).json({ message: 'UTR number already used.' });
         }
         await soldPlanCollection.updateOne(
             { username }, // Find the document by username
-            { $push: { plans: { planId: result.remark1, utr: response.result.utr, timestamp: new Date() } } }, // Add the message object to the existing messages array
+            { $push: { plans: { planId: result.remark1,plan:plan, utr: response.result.utr, timestamp: new Date() } } }, // Add the message object to the existing messages array
             { upsert: true } // Create the document if it doesn't exist
         );
 
@@ -277,7 +280,7 @@ const deletePlan = async (req, res) => {
         const db = getDB();
         const collection = db.collection('plans');
         const id = req.body;
-      
+
         const _id = new ObjectId(id);
         const result = await collection.deleteOne({ _id });
         res.status(200).json({ message: "Plan Deleted Successfully" });
@@ -287,4 +290,34 @@ const deletePlan = async (req, res) => {
     }
 }
 
-module.exports = { addPlan, getAllPlan, buyPlan, verifyPayment,deletePlan };
+const getActivePlans=async(req,res)=>{
+    try {
+        const authHeader = req.header('Authorization');
+        const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
+
+        if (!token) {
+            return res.status(401).json({ message: 'Access denied. No token provided.' });
+        }
+
+        // Verify the token
+        const secretKey = process.env.JWT_SECRET || 'whatsapp'; // Use an environment variable for the secret key
+        let decoded;
+        try {
+            decoded = jwt.verify(token, secretKey);
+        } catch (err) {
+            return res.status(400).json({ message: 'Invalid token.' });
+        }
+
+        const db=getDB();
+        const collection=db.collection('soldPlans');
+
+        const plans=await collection.find().toArray();
+        res.status(200).json(plans);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "internal serverv error" })
+    }
+}
+
+module.exports = { addPlan, getAllPlan, buyPlan, verifyPayment, deletePlan ,getActivePlans};
