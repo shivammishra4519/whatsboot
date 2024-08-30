@@ -63,7 +63,7 @@ const loginWhatsapp = async (req, res) => {
         });
 
         client.on('qr', async (qr) => {
-            console.log('QR Code received');
+            console.log('QR Code received',qr);
             const qrCodeImagePath = path.join(sessionPath, `${sessionId}.png`);
 
             try {

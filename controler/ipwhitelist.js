@@ -29,37 +29,36 @@ const addIp = async (req, res) => {
         const result = await collection.findOne({ username: decoded.number });
 
         if (!result || !result.plans || result.plans.length === 0) {
-            return res.status(400).json({ message: "You have not any Active Plan" });
+            return res.status(400).json({ message: "You do not have any active plan." });
         }
 
         const plan = result.plans[0].plan;
         const timestamp = result.plans[0].timestamp;
         const duration = plan.duration;
+        const ipLimit = plan.ip;
 
         if (!plan) {
-            return res.status(400).json({ message: "You have not any Active Plan" });
+            return res.status(400).json({ message: "You do not have any active plan." });
         }
 
         const expired = isPlanExpired(timestamp, duration);
         if (expired) {
-            // Unset the element at index 0 and remove null values
             await collection.updateOne(
-                { username: decoded.number }, // Filter to find the document
-                { $unset: { "plans.0": "" } } // Unset the element at index 0
+                { username: decoded.number },
+                { $unset: { "plans.0": "" } }
             );
 
-            // Remove null values from the array
             await collection.updateOne(
-                { username: decoded.number }, // Filter to find the document
-                { $pull: { plans: null } } // Remove null values from the array
+                { username: decoded.number },
+                { $pull: { plans: null } }
             );
 
-            return res.status(400).json({ message: "Your plan has expired" });
+            return res.status(400).json({ message: "Your plan has expired." });
         }
 
         const { ipAddress } = req.body;
         if (!ipAddress) {
-            return res.status(400).json({ message: "IP can not be blank" });
+            return res.status(400).json({ message: "IP address cannot be blank." });
         }
 
         const uniqueId = generateUniqueId();
@@ -84,9 +83,15 @@ const addIp = async (req, res) => {
             // Update the existing record
             await tokenCollection.updateOne(
                 { ipAddress },
-                { $set: { token: uniqueId, timestamp: new Date(),encodedData } }
+                { $set: { token: uniqueId, timestamp: new Date(), encodedData } }
             );
         } else {
+            // Check if the IP limit has been reached
+            const ipCount = await tokenCollection.countDocuments({ username: decoded.number });
+            if (ipCount >= ipLimit) {
+                return res.status(400).json({ message: "IP limit reached. Cannot add more IPs." });
+            }
+
             // Insert a new record
             await tokenCollection.insertOne(obj);
         }
@@ -95,9 +100,10 @@ const addIp = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error." });
     }
 }
+
 function isPlanExpired(timestamp, duration) {
     // Parse the timestamp to a Date object
     const purchaseDate = new Date(timestamp);
@@ -125,7 +131,7 @@ function generateUniqueId(length = 6) {
 
 
 
-const getToken=async(req,res)=>{
+const getToken = async (req, res) => {
     try {
         const authHeader = req.header('Authorization');
         const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
@@ -143,10 +149,10 @@ const getToken=async(req,res)=>{
             return res.status(400).json({ message: 'Invalid token.' });
         }
 
-        const username=decoded.number;
-        const db=getDB()
+        const username = decoded.number;
+        const db = getDB()
         const collection = db.collection('ipTokens');
-        const data=await collection.find().toArray();
+        const data = await collection.find().toArray();
         res.status(200).json(data)
     } catch (error) {
         console.log(error);
@@ -156,4 +162,4 @@ const getToken=async(req,res)=>{
 
 
 
-module.exports = { addIp,getToken };
+module.exports = { addIp, getToken };

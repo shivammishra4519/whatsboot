@@ -320,4 +320,33 @@ const getActivePlans=async(req,res)=>{
     }
 }
 
-module.exports = { addPlan, getAllPlan, buyPlan, verifyPayment, deletePlan ,getActivePlans};
+
+const currentPlanUser=async(req,res)=>{
+    try {
+        const authHeader = req.header('Authorization');
+        const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
+
+        if (!token) {
+            return res.status(401).json({ message: 'Access denied. No token provided.' });
+        }
+
+        // Verify the token
+        const secretKey = process.env.JWT_SECRET || 'whatsapp'; // Use an environment variable for the secret key
+        let decoded;
+        try {
+            decoded = jwt.verify(token, secretKey);
+        } catch (err) {
+            return res.status(400).json({ message: 'Invalid token.' });
+        }
+
+        const db=getDB();
+        const collection=db.collection('soldPlans');
+        const username=decoded.number;
+        const result=await collection.findOne({username});
+        res.status(200).json(result)
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "internal serverv error" })
+    }
+}
+module.exports = { addPlan, getAllPlan, buyPlan, verifyPayment, deletePlan ,getActivePlans,currentPlanUser};

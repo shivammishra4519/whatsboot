@@ -1,0 +1,48 @@
+[0830/133503.326:INFO:CONSOLE(150)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v3/yc/r/w8ACmISDjkn.js?_nc_x=Ij3Wp8lg5Kz (150)
+[0830/133503.712:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Feature xr-spatial-tracking's parameters are ignored.", source:  (0)
+[0830/133503.712:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'attribution-reporting'.", source:  (0)
+[0830/133503.712:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'compute-pressure'.", source:  (0)
+[0830/133503.712:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'interest-cohort'.", source:  (0)
+[0830/133503.713:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-issuance'.", source:  (0)
+[0830/133503.713:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'shared-storage'.", source:  (0)
+[0830/133503.713:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'shared-storage-select-url'.", source:  (0)
+[0830/133503.713:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-redemption'.", source:  (0)
+[0830/133503.713:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'unload'.", source:  (0)
+[0830/133503.713:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'window-management'.", source:  (0)
+[0830/133514.968:INFO:CONSOLE(342)] "WAWebLoggerWorker initialized", source: https://static.whatsapp.net/rsrc.php/v3/yx/r/dTw2bpHg7DW.js?_nc_x=Ij3Wp8lg5Kz (342)
+[0830/133514.976:INFO:CONSOLE(342)] "[storage] start setSchemaVersions from fts worker interface", source: https://static.whatsapp.net/rsrc.php/v3/yx/r/dTw2bpHg7DW.js?_nc_x=Ij3Wp8lg5Kz (342)
+[0830/133514.976:INFO:CONSOLE(342)] "[storage] set schema versions: [model-storage,158,fts-storage,8,jobs-storage,1,lru-media-storage-idb,2,offd-storage,4,qpl-storage,0,signal-storage,6,worker-storage,1,sw,2,wawc,14,wawc_db_enc,2]. is worker? true", source: https://static.whatsapp.net/rsrc.php/v3/yx/r/dTw2bpHg7DW.js?_nc_x=Ij3Wp8lg5Kz (342)
+[0830/133539.816:ERROR:cache_util_win.cc(20)] Unable to move the cache: Access is denied. (0x5)
+[0830/133539.816:ERROR:disk_cache.cc(205)] Unable to create cache
+[0830/133539.816:ERROR:gpu_disk_cache.cc(673)] Gpu Cache Creation failed: -2
+[0830/133539.817:ERROR:cache_util_win.cc(20)] Unable to move the cache: Access is denied. (0x5)
+[0830/133539.819:ERROR:disk_cache.cc(205)] Unable to create cache
+[0830/133539.819:ERROR:gpu_disk_cache.cc(673)] Gpu Cache Creation failed: -2
+[0830/133541.834:ERROR:cache_util_win.cc(20)] Unable to move the cache: Access is denied. (0x5)
+[0830/133541.836:ERROR:disk_cache.cc(205)] Unable to create cache
+[0830/133542.324:ERROR:cache_util_win.cc(20)] Unable to move the cache: Access is denied. (0x5)
+[0830/133542.324:ERROR:disk_cache.cc(205)] Unable to create cache
+[0830/133542.324:ERROR:gpu_disk_cache.cc(673)] Gpu Cache Creation failed: -2
+[0830/133542.325:ERROR:cache_util_win.cc(20)] Unable to move the cache: Access is denied. (0x5)
+[0830/133542.325:ERROR:disk_cache.cc(205)] Unable to create cache
+[0830/133542.325:ERROR:gpu_disk_cache.cc(673)] Gpu Cache Creation failed: -2
+[0830/133542.412:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Feature xr-spatial-tracking's parameters are ignored.", source:  (0)
+[0830/133542.412:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'attribution-reporting'.", source:  (0)
+[0830/133542.413:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'compute-pressure'.", source:  (0)
+[0830/133542.413:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'interest-cohort'.", source:  (0)
+[0830/133542.413:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-issuance'.", source:  (0)
+[0830/133542.413:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'shared-storage'.", source:  (0)
+[0830/133542.413:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'shared-storage-select-url'.", source:  (0)
+[0830/133542.413:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'private-state-token-redemption'.", source:  (0)
+[0830/133542.413:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'unload'.", source:  (0)
+[0830/133542.413:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'window-management'.", source:  (0)
+[0830/133542.845:ERROR:service_worker_storage.cc(1933)] Failed to delete the database: Database IO error
+[0830/133548.430:ERROR:quota_database.cc(929)] Could not open the quota database, resetting.
+[0830/133553.352:ERROR:quota_database.cc(929)] Could not open the quota database, resetting.
+[0830/133556.257:ERROR:quota_database.cc(931)] Failed to reset the quota database.
+[0830/133556.257:ERROR:quota_database.cc(931)] Failed to reset the quota database.
+[0830/133604.462:INFO:CONSOLE(342)] "WAWebLoggerWorker initialized", source: https://static.whatsapp.net/rsrc.php/v3/yx/r/dTw2bpHg7DW.js?_nc_x=Ij3Wp8lg5Kz (342)
+[0830/133759.742:INFO:CONSOLE(4)] "Uncaught (in promise) Error: window is not defined", source: https://web.whatsapp.com/ (4)
+[0830/133801.146:INFO:CONSOLE(150)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v3/yc/r/w8ACmISDjkn.js?_nc_x=Ij3Wp8lg5Kz (150)
+[0830/134131.054:INFO:CONSOLE(4)] "Uncaught (in promise) Error: window is not defined", source: https://web.whatsapp.com/ (4)
+[0830/134503.032:INFO:CONSOLE(4)] "Uncaught (in promise) Error: window is not defined", source: https://web.whatsapp.com/ (4)

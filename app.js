@@ -29,9 +29,16 @@ app.use(cookieParser());
 // app.use(cors());
 
 app.use(cors({
-    origin: process.env.ORIGIN, // Your Angular app URL
-    credentials: true // Allow cookies to be sent and received
-  }));
+  origin: function (origin, callback) {
+    if (origin) {
+      callback(null, origin); // Reflect the request origin back to the client
+    } else {
+      callback(null, '*'); // Allow all origins if no origin is provided
+    }
+  },
+  credentials: true // Allow cookies and other credentials to be sent and received
+}));
+
 app.use('/user',users);
 app.use('/whatsapp',whatsapp);
 app.use('/plan',plans);

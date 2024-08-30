@@ -120,7 +120,6 @@ const adminregister = async (req, res) => {
 
 const checkRole = async (req, res) => {
   try {
-
     const authHeader = req.header('Authorization');
     const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
 
@@ -134,25 +133,32 @@ const checkRole = async (req, res) => {
     try {
       decoded = jwt.verify(token, secretKey);
     } catch (err) {
-      return res.status(400).json({ message: 'Invalid token.' });
+      return res.status(401).json({ message: 'Invalid token.' });
     }
+
     const db = getDB();
-    const collection = db.collection('users')
+    const collection = db.collection('users');
     const number = decoded.number;
     const findResult = await collection.findOne({ number });
+
     if (!findResult) {
-      return res.status(400).json({ message: "invalid request" });
+      return res.status(400).json({ message: 'Invalid request: user not found.' });
     }
+
     const role = findResult.role;
-    if (role == 'admin') {
-      return res.status(200).json({ message: "success", role })
+    if (role === 'admin') {
+      return res.status(200).json({ message: 'success', role });
     }
-    res.status(400).json({ message: "" })
+
+    // If the role is not 'admin', still return a successful response with the role
+    return res.status(200).json({ message: 'success', role:'user' });
+
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({ message: "Internal server error" });
+    console.error('Error in checkRole:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
+
 
 
 const logout = (req, res) => {
