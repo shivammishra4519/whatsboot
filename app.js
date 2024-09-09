@@ -11,7 +11,8 @@ const cookieParser = require('cookie-parser');
 const socketIo = require('socket.io');
 const message=require('./route/messageRoute');
 const payment=require('./route/paymentRoute');
-const ip=require('./route/ipRoute')
+const ip=require('./route/ipRoute');
+const autoreply=require('./route/autoreplyRoute');
 const http = require('http');
 require('dotenv').config();
 
@@ -42,9 +43,10 @@ app.use(cors({
 app.use('/user',users);
 app.use('/whatsapp',whatsapp);
 app.use('/plan',plans);
-app.use('/message',message)
-app.use('/payment',payment)
-app.use('/ip',ip)
+app.use('/message',message);
+app.use('/payment',payment);
+app.use('/ip',ip);
+app.use('/autoreply',autoreply);
  
 app.get('/',(req,res)=>{
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -55,7 +57,7 @@ app.get('/',(req,res)=>{
 app.get('/current-user', verifyToken, (req, res) => {
   // console.log("auth")
   if (req.user) {
-    res.json({ user: req.user }); // `req.user` contains user information from token
+    res.json({ message :"success"}); // `req.user` contains user information from token
   } else {
     res.status(401).json({ message: 'User not authenticated' });
   }

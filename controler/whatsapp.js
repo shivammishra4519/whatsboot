@@ -9,16 +9,16 @@ const sessions = {};
 
 
 const deleteSessionFolder = async (sessionId) => {
-//     try {
-//         const sessionPath = path.join(__dirname, 'sessions', sessionId);
-//         console.log(`Deleting folder at path: ${sessionPath}`);
-//   // Remove the folder and its contents
-//   await fs.rm(sessionPath, { recursive: true, force: true });
+    //     try {
+    //         const sessionPath = path.join(__dirname, 'sessions', sessionId);
+    //         console.log(`Deleting folder at path: ${sessionPath}`);
+    //   // Remove the folder and its contents
+    //   await fs.rm(sessionPath, { recursive: true, force: true });
 
-//   console.log(`Folder deleted successfully: ${sessionPath}`);
-// } catch (error) {
-//   console.error(`Error deleting folder: ${error.message}`);
-// }
+    //   console.log(`Folder deleted successfully: ${sessionPath}`);
+    // } catch (error) {
+    //   console.error(`Error deleting folder: ${error.message}`);
+    // }
 };
 
 const loginWhatsapp = async (req, res) => {
@@ -30,7 +30,7 @@ const loginWhatsapp = async (req, res) => {
             return res.status(401).json({ message: 'Access denied. No token provided.' });
         }
 
-        const secretKey = process.env.JWT_SECRET || 'whatsapp'; 
+        const secretKey = process.env.JWT_SECRET || 'whatsapp';
         let decoded;
         try {
             decoded = jwt.verify(token, secretKey);
@@ -63,7 +63,7 @@ const loginWhatsapp = async (req, res) => {
         });
 
         client.on('qr', async (qr) => {
-            console.log('QR Code received',qr);
+            console.log('QR Code received', qr);
             const qrCodeImagePath = path.join(sessionPath, `${sessionId}.png`);
 
             try {
@@ -106,6 +106,67 @@ const loginWhatsapp = async (req, res) => {
                 }
             }
         });
+        client.on('message', async (msg) => {
+
+            const phoneNumber = msg.to;
+            const cleanedPhoneNumber = phoneNumber.replace('@c.us', '');
+
+            let messageType = 'text';
+            let mediaUrl = null;
+
+            if (msg.hasMedia) {
+                const media = await msg.downloadMedia();
+                messageType = msg.type; // Set the message type to image, document, etc.
+
+                // Save the media file and set the media URL
+                ; // Adjust this path as needed for accessing the media
+            }
+            try {
+                const db = getDB();
+                const collection = db.collection('autoreply');
+                const soldPlanCollection = db.collection('soldPlans');
+                let username
+
+                // Remove the first '91' if it exists
+                if (phoneNumber.startsWith('91')) {
+                    username = phoneNumber.slice(2);
+                }
+
+
+                const result = await soldPlanCollection.findOne({ username });
+                if (result) {
+                    const plan = result.plans[0]
+                }
+
+            } catch (error) {
+                console.error('Error saving incoming message:', error);
+            }
+            try {
+                const db = getDB();
+                const collection = db.collection('receivedmessages');
+
+                // Structure the message data in the desired format
+                const messageData = {
+                    from: msg.from,        // Sender's number
+                    body: msg.body || '',  // Message content (could be empty if it's an image)
+                    type: messageType,     // Message type (text, image, etc.)
+                    timestamp: new Date(), // Timestamp of the message
+                    ip: req.ip             // Client's IP address (if available in the request)
+                };
+
+                // Store the message under the corresponding username/sessionId
+                await collection.updateOne(
+                    { username: cleanedPhoneNumber }, // Find the document by username
+                    { $push: { messages: messageData } }, // Add the message to the 'messages' array
+                    { upsert: true } // Create the document if it doesn't exist
+                );
+
+                console.log('Message saved to database');
+            } catch (error) {
+                console.error('Error saving incoming message:', error);
+            }
+        });
+
 
         client.on('disconnected', reason => {
             console.error(`Client disconnected: ${reason}`);
@@ -233,7 +294,7 @@ const sendQuickMessage = async (req, res) => {
         }
 
         const client = sessions[username];
-       
+
 
         if (!client) {
             return res.status(404).json({ error: 'Session not found or not authenticated' });
@@ -243,10 +304,41 @@ const sendQuickMessage = async (req, res) => {
             console.log(`${sessionId} authenticated!`);
         });
         const chatId = `91${to}@c.us`; // Append @c.us for regular WhatsApp numbers
+        const db = getDB();
+        const collection = db.collection('soldPlans');
+        const tokenCollection = db.collection('ipTokens');
+        const result = await collection.findOne({ username: decoded.number });
 
+        if (!result || !result.plans || result.plans.length === 0) {
+            return res.status(400).json({ message: "You do not have any active plan." });
+        }
+
+        const plan = result.plans[0].plan;
+        const timestamp = result.plans[0].timestamp;
+        const duration = plan.duration;
+        const ipLimit = plan.ip;
+
+        if (!plan) {
+            return res.status(400).json({ message: "You do not have any active plan." });
+        }
+
+        const expired = isPlanExpired(timestamp, duration);
+        if (expired) {
+            await collection.updateOne(
+                { username: decoded.number },
+                { $unset: { "plans.0": "" } }
+            );
+
+            await collection.updateOne(
+                { username: decoded.number },
+                { $pull: { plans: null } }
+            );
+
+            return res.status(400).json({ message: "Your plan has expired." });
+        }
         try {
             const response = await client.sendMessage(chatId, message);
-            console.log(`Message sent to ${to}: ${message}`);
+
 
             // Save the message to the database
             const db = getDB();
@@ -297,7 +389,7 @@ const sendQuickMessageMulti = async (req, res) => {
         }
 
         const client = sessions[username];
-        
+
 
         if (!client) {
             return res.status(404).json({ error: 'Session not found or not authenticated' });
@@ -306,6 +398,38 @@ const sendQuickMessageMulti = async (req, res) => {
         // Split the 'to' string by commas to get an array of numbers
         const numbers = to.split(',');
 
+        const db = getDB();
+        const collection = db.collection('soldPlans');
+        const tokenCollection = db.collection('ipTokens');
+        const result = await collection.findOne({ username: decoded.number });
+
+        if (!result || !result.plans || result.plans.length === 0) {
+            return res.status(400).json({ message: "You do not have any active plan." });
+        }
+
+        const plan = result.plans[0].plan;
+        const timestamp = result.plans[0].timestamp;
+        const duration = plan.duration;
+        const ipLimit = plan.ip;
+
+        if (!plan) {
+            return res.status(400).json({ message: "You do not have any active plan." });
+        }
+
+        const expired = isPlanExpired(timestamp, duration);
+        if (expired) {
+            await collection.updateOne(
+                { username: decoded.number },
+                { $unset: { "plans.0": "" } }
+            );
+
+            await collection.updateOne(
+                { username: decoded.number },
+                { $pull: { plans: null } }
+            );
+
+            return res.status(400).json({ message: "Your plan has expired." });
+        }
         // Initialize an array to store the results of sending messages
         const sendResults = [];
 
@@ -341,5 +465,32 @@ const sendQuickMessageMulti = async (req, res) => {
     }
 };
 
+function isPlanExpired(timestamp, duration) {
+    // Parse the timestamp to a Date object
+    const purchaseDate = new Date(timestamp);
+
+    // Calculate the expiration date by adding the duration to the purchase date
+    const expirationDate = new Date(purchaseDate);
+    expirationDate.setDate(purchaseDate.getDate() + duration);
+
+    // Get the current date
+    const currentDate = new Date();
+
+    // Compare the current date with the expiration date
+    return currentDate > expirationDate;
+}
+
+
+async function checkAnswer(to, msg) {
+    try {
+        const username = to;
+        const db = getDB();
+        const collection = db.collection('autoreply');
+        const result = await collection.findOne({ username });
+
+    } catch (error) {
+
+    }
+}
 
 module.exports = { loginWhatsapp, sendMessage, isLoggedIn, sendQuickMessage, sendQuickMessageMulti, sessions };

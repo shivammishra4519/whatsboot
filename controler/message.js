@@ -60,7 +60,7 @@ const incomingMessages=async(req,res)=>{
         }
         const db=getDB();
         const collection=db.collection('receivedmessages');
-        const username=`91${decoded.number}@c.us`;
+        const username=`91${decoded.number}`;
         const result=await collection.findOne({username});
         res.status(200).json(result)
 
