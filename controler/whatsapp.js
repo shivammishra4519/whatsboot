@@ -109,63 +109,83 @@ const loginWhatsapp = async (req, res) => {
         client.on('message', async (msg) => {
 
             const phoneNumber = msg.to;
+            
             const cleanedPhoneNumber = phoneNumber.replace('@c.us', '');
-
+        
             let messageType = 'text';
             let mediaUrl = null;
-
+        
             if (msg.hasMedia) {
                 const media = await msg.downloadMedia();
                 messageType = msg.type; // Set the message type to image, document, etc.
-
-                // Save the media file and set the media URL
-                ; // Adjust this path as needed for accessing the media
+        
+                // Save the media file and set the media URL (this part should be implemented as per your storage logic)
             }
+        
             try {
                 const db = getDB();
-                const collection = db.collection('autoreply');
                 const soldPlanCollection = db.collection('soldPlans');
-                let username
-
+                let username = cleanedPhoneNumber;
+      
                 // Remove the first '91' if it exists
                 if (phoneNumber.startsWith('91')) {
-                    username = phoneNumber.slice(2);
+                    username = cleanedPhoneNumber.slice(2);
+                
                 }
-
-
-                const result = await soldPlanCollection.findOne({ username });
-                if (result) {
-                    const plan = result.plans[0]
+        
+                const planResult = await soldPlanCollection.findOne({ username });
+              
+                if (planResult) {
+                    const plan = planResult.plans[0].plan;
+                   
+                    if (plan && plan.autoReplay === 'yes') {
+                        const autoreplyCollection = db.collection('autoreply');
+                        const autoreplyResult = await autoreplyCollection.findOne({ username });
+                       
+                        if (autoreplyResult) {
+                            const sanitizedMessage = msg.body.trim().replace(/\s+/g, ' ').toLowerCase();
+                            const objectArray = autoreplyResult.answers; // Assuming answers are stored in autoreplyResult
+                            const messageResult = objectArray.find(obj => obj.message === sanitizedMessage);
+                           
+                            if (messageResult) {
+                                const answer = messageResult.answer;
+                                msg.reply(answer);
+                                
+                            }
+                        }
+                    }
                 }
-
+        
             } catch (error) {
-                console.error('Error saving incoming message:', error);
+                console.error('Error processing auto-reply:', error);
             }
+        
             try {
                 const db = getDB();
-                const collection = db.collection('receivedmessages');
-
-                // Structure the message data in the desired format
+                const receivedMessagesCollection = db.collection('receivedmessages');
+        
+                // Structure the message data
                 const messageData = {
                     from: msg.from,        // Sender's number
                     body: msg.body || '',  // Message content (could be empty if it's an image)
                     type: messageType,     // Message type (text, image, etc.)
                     timestamp: new Date(), // Timestamp of the message
-                    ip: req.ip             // Client's IP address (if available in the request)
+                    // Remove or handle IP address appropriately. 'req.ip' is not available here.
                 };
-
+        
                 // Store the message under the corresponding username/sessionId
-                await collection.updateOne(
+                await receivedMessagesCollection.updateOne(
                     { username: cleanedPhoneNumber }, // Find the document by username
                     { $push: { messages: messageData } }, // Add the message to the 'messages' array
                     { upsert: true } // Create the document if it doesn't exist
                 );
-
+        
                 console.log('Message saved to database');
             } catch (error) {
                 console.error('Error saving incoming message:', error);
             }
         });
+        
 
 
         client.on('disconnected', reason => {

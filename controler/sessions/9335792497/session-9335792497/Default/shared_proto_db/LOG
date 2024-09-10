@@ -1,2 +1,3 @@
-2024/09/09-10:00:19.472 33b8 Creating DB E:\whatsapp service\backend\controler\sessions\9335792497\session-9335792497\Default\shared_proto_db since it was missing.
-2024/09/09-10:00:19.482 33b8 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9335792497\session-9335792497\Default\shared_proto_db/MANIFEST-000001
+2024/09/10-11:00:40.555 4564 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9335792497\session-9335792497\Default\shared_proto_db/MANIFEST-000001
+2024/09/10-11:00:40.562 4564 Recovering log #3
+2024/09/10-11:00:40.562 4564 Reusing old log E:\whatsapp service\backend\controler\sessions\9335792497\session-9335792497\Default\shared_proto_db/000003.log 
