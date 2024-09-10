@@ -412,7 +412,7 @@ const sendQuickMessageMulti = async (req, res) => {
 
 
         if (!client) {
-            return res.status(404).json({ error: 'Session not found or not authenticated' });
+            return res.status(400).json({ error: 'Session not found or not authenticated' });
         }
 
         // Split the 'to' string by commas to get an array of numbers
