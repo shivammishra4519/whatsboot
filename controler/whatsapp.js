@@ -109,7 +109,6 @@ const loginWhatsapp = async (req, res) => {
         client.on('message', async (msg) => {
 
             const phoneNumber = msg.to;
-            
             const cleanedPhoneNumber = phoneNumber.replace('@c.us', '');
         
             let messageType = 'text';
@@ -118,7 +117,7 @@ const loginWhatsapp = async (req, res) => {
             if (msg.hasMedia) {
                 const media = await msg.downloadMedia();
                 messageType = msg.type; // Set the message type to image, document, etc.
-        
+                
                 // Save the media file and set the media URL (this part should be implemented as per your storage logic)
             }
         
@@ -126,31 +125,30 @@ const loginWhatsapp = async (req, res) => {
                 const db = getDB();
                 const soldPlanCollection = db.collection('soldPlans');
                 let username = cleanedPhoneNumber;
-      
+        
                 // Remove the first '91' if it exists
                 if (phoneNumber.startsWith('91')) {
                     username = cleanedPhoneNumber.slice(2);
-                
                 }
         
                 const planResult = await soldPlanCollection.findOne({ username });
               
                 if (planResult) {
                     const plan = planResult.plans[0].plan;
-                   
+        
                     if (plan && plan.autoReplay === 'yes') {
                         const autoreplyCollection = db.collection('autoreply');
                         const autoreplyResult = await autoreplyCollection.findOne({ username });
-                       
+        
                         if (autoreplyResult) {
                             const sanitizedMessage = msg.body.trim().replace(/\s+/g, ' ').toLowerCase();
                             const objectArray = autoreplyResult.answers; // Assuming answers are stored in autoreplyResult
                             const messageResult = objectArray.find(obj => obj.message === sanitizedMessage);
-                           
+        
                             if (messageResult) {
                                 const answer = messageResult.answer;
-                                msg.reply(answer);
-                                
+                                // Send the reply message
+                                await client.sendMessage(msg.from, answer); // Corrected to msg.from
                             }
                         }
                     }
@@ -170,7 +168,6 @@ const loginWhatsapp = async (req, res) => {
                     body: msg.body || '',  // Message content (could be empty if it's an image)
                     type: messageType,     // Message type (text, image, etc.)
                     timestamp: new Date(), // Timestamp of the message
-                    // Remove or handle IP address appropriately. 'req.ip' is not available here.
                 };
         
                 // Store the message under the corresponding username/sessionId
@@ -185,6 +182,7 @@ const loginWhatsapp = async (req, res) => {
                 console.error('Error saving incoming message:', error);
             }
         });
+        
         
 
 
