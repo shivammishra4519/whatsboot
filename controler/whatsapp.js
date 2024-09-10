@@ -225,7 +225,7 @@ const sendMessage = async (req, res) => {
         const client = sessions[sessionId];
 
         if (!client) {
-            return res.status(404).json({ error: 'Session not found or not authenticated' });
+            return res.status(404).json({ error: 'Session not found or not authenticated12' });
         }
 
         const chatId = `${to}@c.us`; // Append @c.us for regular WhatsApp numbers
@@ -315,19 +315,26 @@ const sendQuickMessage = async (req, res) => {
 
         const client = sessions[username];
 
-
         if (!client) {
-            return res.status(404).json({ error: 'Session not found or not authenticated' });
+            console.log(`Session for ${username} not found.`);
+            return res.status(404).json({ error: 'Please Login First' });
         }
-        client.on('ready', async () => { });
+
+        // Ensure client is authenticated
         client.on('authenticated', () => {
-            console.log(`${sessionId} authenticated!`);
+            console.log(`Client authenticated for session: ${username}`);
         });
+
+        if (!client.info || !client.info.wid) { 
+            return res.status(404).json({ error: 'Client not authenticated yet.' });
+        }
+
         const chatId = `91${to}@c.us`; // Append @c.us for regular WhatsApp numbers
         const db = getDB();
         const collection = db.collection('soldPlans');
-        const tokenCollection = db.collection('ipTokens');
-        const result = await collection.findOne({ username: decoded.number });
+        
+        // Check the user's active plan
+        const result = await collection.findOne({ username });
 
         if (!result || !result.plans || result.plans.length === 0) {
             return res.status(400).json({ message: "You do not have any active plan." });
@@ -345,28 +352,28 @@ const sendQuickMessage = async (req, res) => {
         const expired = isPlanExpired(timestamp, duration);
         if (expired) {
             await collection.updateOne(
-                { username: decoded.number },
+                { username },
                 { $unset: { "plans.0": "" } }
             );
 
             await collection.updateOne(
-                { username: decoded.number },
+                { username },
                 { $pull: { plans: null } }
             );
 
             return res.status(400).json({ message: "Your plan has expired." });
         }
+
+        // Sending WhatsApp Message
         try {
             const response = await client.sendMessage(chatId, message);
 
-
             // Save the message to the database
-            const db = getDB();
-            const collection = db.collection('sendedmessages');
-            const ip = req.ip
-            await collection.updateOne(
+            const messageCollection = db.collection('sendedmessages');
+            const ip = req.ip;
+            await messageCollection.updateOne(
                 { username }, // Find the document by username
-                { $push: { messages: { to, message, timestamp: new Date(), ip } } }, // Add the message object to the existing messages array
+                { $push: { messages: { to, message, timestamp: new Date(), ip } } }, // Add the message to the 'messages' array
                 { upsert: true } // Create the document if it doesn't exist
             );
 
@@ -412,7 +419,7 @@ const sendQuickMessageMulti = async (req, res) => {
 
 
         if (!client) {
-            return res.status(400).json({ error: 'Session not found or not authenticated' });
+            return res.status(400).json({ error: 'Session not found or not authenticated222' });
         }
 
         // Split the 'to' string by commas to get an array of numbers
