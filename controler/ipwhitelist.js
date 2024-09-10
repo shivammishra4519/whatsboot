@@ -152,7 +152,7 @@ const getToken = async (req, res) => {
         const username = decoded.number;
         const db = getDB()
         const collection = db.collection('ipTokens');
-        const data = await collection.find().toArray();
+        const data = await collection.find({username}).toArray();
         res.status(200).json(data)
     } catch (error) {
         console.log(error);
@@ -161,5 +161,33 @@ const getToken = async (req, res) => {
 }
 
 
+const whiteListedIp=async(req,res)=>{
+    try {
+        const authHeader = req.header('Authorization');
+        const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
 
-module.exports = { addIp, getToken };
+        if (!token) {
+            return res.status(401).json({ message: 'Access denied. No token provided.' });
+        }
+
+        // Verify the token
+        const secretKey = process.env.JWT_SECRET || 'whatsapp'; // Use an environment variable for the secret key
+        let decoded;
+        try {
+            decoded = jwt.verify(token, secretKey);
+        } catch (err) {
+            return res.status(400).json({ message: 'Invalid token.' });
+        }
+
+        const username = decoded.number;
+        const db = getDB()
+        const collection = db.collection('ipTokens');
+        const data = await collection.find().toArray();
+        res.status(200).json(data)
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+module.exports = { addIp, getToken,whiteListedIp };
