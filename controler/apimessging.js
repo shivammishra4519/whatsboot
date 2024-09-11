@@ -15,53 +15,67 @@ const sendSingleMessage = async (req, res) => {
         const token = data.token;
         const number = data.number;
         const message = data.message;
-        if (!token) {
-            return res.status(400).json({ message: "Can not Found Token" });
+        
+        if (!token || !number || !message) {
+            return res.status(400).json({ message: "Required parameters are missing" });
         }
-        if (!number) {
-            return res.status(400).json({ message: "Number can not be blank" });
-        }
-        if (!message) {
-            return res.status(400).json({ message: "Message can not be Blank" });
-        }
+
         const db = getDB();
-        const collection = db.collection('soldPlans');
         const tokenCollection = db.collection('ipTokens');
+        const messageCollection = db.collection('sendedmessages');
+
         const userInfo = await tokenCollection.findOne({ encodedData: token });
-      
         if (!userInfo) {
             return res.status(400).json({ message: "Invalid token" });
         }
-        const ip = req.ip;
-       
 
-        const decodedData = Buffer.from(token, 'base64').toString('utf8');
-        const parsedData = JSON.parse(decodedData);
-        // if (userInfo.token == parsedData.tk) {
-        //     return res.status(400).json({ message: "Invalid Token" });
-        // }
+        const ip = req.ip.replace(/^::ffff:/, "");
+        const decodedData = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
+        
+        if (ip !== decodedData.ip) {
+            return res.status(400).json({ message: "IP is not listed" });
+        }
+
         const sessionId = userInfo.username;
         const client = sessionsArray[sessionId];
-        console.log(client)
+
         if (!client) {
-            return res.status(404).json({ error: 'Session not found or not authenticated12' });
+            return res.status(404).json({ error: 'Session not found or not authenticated' });
         }
+
         const to = `91${number}@c.us`;
 
-        try {
-            const response = await client.sendMessage(to, message);
-           
-            res.status(200).json({ success: true, response });
-        } catch (err) {
-            console.error('Error sending message:', err);
-            res.status(500).json({ error: 'Failed to send message' });
-        }
+        const sendMessageWithRetry = async (retryCount = 3) => {
+            try {
+                const response = await client.sendMessage(to, message);
+                
+                // Save the message to the database
+                await messageCollection.updateOne(
+                    { username: sessionId },
+                    { $push: { messages: { to, message, timestamp: new Date(), ip } } },
+                    { upsert: true }
+                );
 
+                return res.status(200).json({ success: true, response });
+            } catch (err) {
+                if (retryCount > 0) {
+                    console.warn(`Retrying sendMessage (${retryCount} retries left)...`);
+                    return sendMessageWithRetry(retryCount - 1);
+                } else {
+                    console.error('Failed to send message after retries:', err);
+                    return res.status(500).json({ error: 'Failed to send message after retries' });
+                }
+            }
+        };
+
+        await sendMessageWithRetry();
 
     } catch (error) {
-        console.error('Error in addAnswer:', error);
+        console.error('Error in sendSingleMessage:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
-}
+};
+
+
 
 module.exports = { sendSingleMessage }

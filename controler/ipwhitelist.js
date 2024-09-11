@@ -20,14 +20,16 @@ const addIp = async (req, res) => {
         try {
             decoded = jwt.verify(token, secretKey);
         } catch (err) {
+            console.error('Token verification failed:', err);
             return res.status(400).json({ message: 'Invalid token.' });
         }
 
         const db = getDB();
         const collection = db.collection('soldPlans');
         const tokenCollection = db.collection('ipTokens');
+        
+        // Find the user by token
         const result = await collection.findOne({ username: decoded.number });
-
         if (!result || !result.plans || result.plans.length === 0) {
             return res.status(400).json({ message: "You do not have any active plan." });
         }
@@ -75,34 +77,43 @@ const addIp = async (req, res) => {
             timestamp: new Date(),
             encodedData
         };
+        const username=decoded.number;
 
         // Check if the IP address already exists in the ipTokens collection
-        const existingToken = await tokenCollection.findOne({ ipAddress });
+        // const existingToken = await tokenCollection.findOne({ ipAddress });
+        const existingToken = await tokenCollection.findOne({ 
+            ipAddress: ipAddress, 
+            username: username 
+          });
+        
 
         if (existingToken) {
-            // Update the existing record
-            await tokenCollection.updateOne(
+            const updateResult = await tokenCollection.updateOne(
                 { ipAddress },
                 { $set: { token: uniqueId, timestamp: new Date(), encodedData } }
             );
         } else {
-            // Check if the IP limit has been reached
+          
             const ipCount = await tokenCollection.countDocuments({ username: decoded.number });
+            console.log("IP Count: ", ipCount);
+
             if (ipCount >= ipLimit) {
                 return res.status(400).json({ message: "IP limit reached. Cannot add more IPs." });
             }
 
             // Insert a new record
-            await tokenCollection.insertOne(obj);
+            const insertResult = await tokenCollection.insertOne(obj);
+            
         }
 
         return res.status(200).json({ encodedData });
 
     } catch (error) {
-        console.log(error);
+        console.error('Error in addIp:', error);
         return res.status(500).json({ message: "Internal server error." });
     }
-}
+};
+
 
 function isPlanExpired(timestamp, duration) {
     // Parse the timestamp to a Date object
@@ -190,4 +201,50 @@ const whiteListedIp=async(req,res)=>{
     }
 }
 
-module.exports = { addIp, getToken,whiteListedIp };
+const deleteIp = async (req, res) => {
+    try {
+        // Extract the Authorization header and token from cookies
+        const authHeader = req.header('Authorization');
+        const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
+
+        // If no token is provided, return a 401 status
+        if (!token) {
+            return res.status(401).json({ message: 'Access denied. No token provided.' });
+        }
+
+        // Verify the token
+        const secretKey = process.env.JWT_SECRET || 'whatsapp'; // Ensure the secret key is in env variables
+        let decoded;
+        try {
+            decoded = jwt.verify(token, secretKey);
+        } catch (err) {
+            return res.status(400).json({ message: 'Invalid token.' });
+        }
+
+        // Ensure id is provided and valid
+        const id = req.body._id;
+        if (!id) {
+            return res.status(400).json({ message: 'ID is required.' });
+        }
+
+        const _id = new ObjectId(id); // Convert the provided ID to ObjectId
+        const db = getDB();
+        const collection = db.collection('ipTokens');
+
+        // Attempt to delete the document
+        const result = await collection.deleteOne({ _id });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'IP not found.' });
+        }
+
+        // Success
+        res.status(200).json({ message: 'IP deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+module.exports = { addIp, getToken,whiteListedIp,deleteIp };
