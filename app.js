@@ -15,6 +15,7 @@ const ip=require('./route/ipRoute');
 const autoreply=require('./route/autoreplyRoute');
 const apiRoute=require('./route/apiRoute');
 const http = require('http');
+const mediaRoute=require('./controler/mediaRoute')
 require('dotenv').config();
 
 
@@ -49,6 +50,7 @@ app.use('/payment',payment);
 app.use('/ip',ip);
 app.use('/autoreply',autoreply);
 app.use('/api',apiRoute);
+app.use('/api',mediaRoute);
  
 app.get('/',(req,res)=>{
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;

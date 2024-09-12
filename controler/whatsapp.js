@@ -91,6 +91,14 @@ const loginWhatsapp = async (req, res) => {
 
         client.on('ready', async () => {
             console.log(`${sessionId} is ready!`);
+            const userId = client.info.wid._serialized; // WhatsApp ID of the logged-in user
+            const pushName = client.info.pushname; // User's name
+            const platform = client.info.platform; // Platform of the logged-in user
+        
+            console.log('Logged-in user details:');
+            console.log('User ID:', userId);
+            console.log('User Name:', pushName);
+            console.log('Platform:', platform);
             try {
                 const db = getDB();
                 await db.collection('sessions').updateOne(
