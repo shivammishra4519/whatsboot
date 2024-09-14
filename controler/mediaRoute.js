@@ -51,6 +51,7 @@ const convertVideoToMP4 = (inputPath, outputPath) => {
 };
 
 // Endpoint to send media
+// Endpoint to send media
 router.post('/send-media', upload.single('file'), async (req, res) => {
     try {
         // Authentication
@@ -71,29 +72,29 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
             return res.status(400).json({ message: 'Invalid token.' });
         }
 
-        const { number } = req.body;
+        // Extract data from request
+        const { number, caption } = req.body; // Use 'caption' instead of 'message'
         const file = req.file;
 
         if (!number || !file) {
-            return res.status(400).json({ message: "Required parameters are missing" });
+            return res.status(400).json({ message: 'Required parameters are missing.' });
         }
 
         // Check if the media file is too large
         const maxSize = 16 * 1024 * 1024; // 16 MB
         if (file.size > maxSize) {
-            return res.status(400).json({ message: "File size exceeds the 16 MB limit." });
+            return res.status(400).json({ message: 'File size exceeds the 16 MB limit.' });
         }
 
         const db = getDB();
         const messageCollection = db.collection('sendedmessages');
 
-        const ip = req.ip.replace(/^::ffff:/, "");
-        const sessionId = decoded.number;  // Use the decoded token data
-
+        const ip = req.ip.replace(/^::ffff:/, '');
+        const sessionId = decoded.number; // Use the decoded token data
         const client = sessionsArray[sessionId];
 
         if (!client) {
-            return res.status(404).json({ error: 'Session not found or not authenticated' });
+            return res.status(404).json({ error: 'Session not found or not authenticated.' });
         }
 
         const to = `91${number}@c.us`;
@@ -113,7 +114,7 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
                 // Check if the file exists
                 if (!fs.existsSync(filePath)) {
                     console.error('File does not exist:', filePath);
-                    return res.status(400).json({ error: 'File does not exist' });
+                    return res.status(400).json({ error: 'File does not exist.' });
                 }
 
                 const media = MessageMedia.fromFilePath(filePath);
@@ -124,12 +125,13 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
                         mimetype: media.mimetype,
                         filename: file.filename,
                         path: filePath
-                    }
+                    },
+                    caption // Include the caption (message)
                 });
 
-                // Send the media
-                const response = await client.sendMessage(to, media);
-                console.log('Media sent successfully:', response);
+                // Send the media with a caption
+                const response = await client.sendMessage(to, media, { caption }); // Send with caption
+                console.log('Media sent successfully with caption:', response);
 
                 // Optionally delete the file after sending
                 fs.unlink(filePath, (err) => {
@@ -139,7 +141,7 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
                 // Save the message to the database
                 await messageCollection.updateOne(
                     { username: sessionId },
-                    { $push: { messages: { to, media: file.filename, timestamp: new Date(), ip } } },
+                    { $push: { messages: { to, media: file.filename, caption, timestamp: new Date(), ip } } },
                     { upsert: true }
                 );
 
@@ -151,7 +153,7 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
                     return sendMediaWithRetry(retryCount - 1);
                 } else {
                     console.error('Failed to send media after retries:', err);
-                    return res.status(500).json({ error: 'Failed to send media after retries' });
+                    return res.status(500).json({ error: 'Failed to send media after retries.' });
                 }
             }
         };
@@ -160,8 +162,11 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
 
     } catch (error) {
         console.error('Error in sendMediaWithRetry:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Internal Server Error.' });
     }
 });
+
+
+
 
 module.exports = router;

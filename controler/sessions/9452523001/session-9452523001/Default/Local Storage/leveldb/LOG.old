@@ -1,3 +1,5 @@
-2024/09/14-14:22:05.952 4be4 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Local Storage\leveldb/MANIFEST-000001
-2024/09/14-14:22:05.959 4be4 Recovering log #4
-2024/09/14-14:22:05.961 4be4 Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Local Storage\leveldb/000004.log 
+2024/09/14-18:22:44.768 8a0 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Local Storage\leveldb/MANIFEST-000001
+2024/09/14-18:22:44.775 8a0 Recovering log #4
+2024/09/14-18:22:44.775 8a0 Level-0 table #7: started
+2024/09/14-18:22:44.781 8a0 Level-0 table #7: 15191 bytes OK
+2024/09/14-18:22:44.788 8a0 Delete type=0 #4

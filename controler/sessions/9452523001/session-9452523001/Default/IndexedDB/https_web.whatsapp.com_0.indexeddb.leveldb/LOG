@@ -1,13 +1,13 @@
-2024/09/14-14:23:28.747 180 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2024/09/14-14:23:28.748 180 Recovering log #52
-2024/09/14-14:23:28.753 180 Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000052.log 
-2024/09/14-14:23:30.179 740 Level-0 table #57: started
-2024/09/14-14:23:30.186 740 Level-0 table #57: 168293 bytes OK
-2024/09/14-14:23:30.189 740 Delete type=0 #52
-2024/09/14-14:23:30.190 180 Manual compaction at level-0 from '\x00\x1e\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x1f\x00\x00\x00' @ 0 : 0; will stop at (end)
-2024/09/14-14:23:31.324 30ac Compacting 1@1 + 1@2 files
-2024/09/14-14:23:31.345 30ac Generated table #58@1: 18510 keys, 674750 bytes
-2024/09/14-14:23:31.345 30ac Compacted 1@1 + 1@2 files => 674750 bytes
-2024/09/14-14:23:31.347 30ac compacted to: files[ 0 0 1 0 0 0 0 ]
-2024/09/14-14:23:31.348 30ac Delete type=2 #54
-2024/09/14-14:23:31.348 30ac Delete type=2 #57
+2024/09/14-18:25:50.752 26a4 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2024/09/14-18:25:50.752 26a4 Recovering log #64
+2024/09/14-18:25:50.762 26a4 Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000064.log 
+2024/09/14-18:25:52.333 1ac0 Level-0 table #69: started
+2024/09/14-18:25:52.341 1ac0 Level-0 table #69: 328829 bytes OK
+2024/09/14-18:25:52.343 1ac0 Delete type=0 #64
+2024/09/14-18:25:52.344 26a4 Manual compaction at level-0 from '\x00%\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00&\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/09/14-18:25:53.516 7d0 Compacting 1@1 + 1@2 files
+2024/09/14-18:25:53.547 7d0 Generated table #70@1: 27470 keys, 1037762 bytes
+2024/09/14-18:25:53.547 7d0 Compacted 1@1 + 1@2 files => 1037762 bytes
+2024/09/14-18:25:53.550 7d0 compacted to: files[ 0 0 1 0 0 0 0 ]
+2024/09/14-18:25:53.550 7d0 Delete type=2 #66
+2024/09/14-18:25:53.550 7d0 Delete type=2 #69
