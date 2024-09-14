@@ -58,6 +58,8 @@ const loginWhatsapp = async (req, res) => {
                 clientId: sessionId,
                 dataPath: sessionPath,
             }), puppeteer: {
+                //  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+                executablePath: '/usr/bin/google-chrome',
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             },
         });
