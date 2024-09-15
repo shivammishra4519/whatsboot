@@ -1,4 +1,13 @@
-2024/09/14-18:22:45.223 2b3c Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2024/09/14-18:22:45.224 2b3c Recovering log #64
-2024/09/14-18:22:45.227 2b3c Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000064.log 
-2024/09/14-18:22:46.728 910 Manual compaction at level-0 from '\x00$\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00%\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/09/15-12:15:54.145 4834 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2024/09/15-12:15:54.146 4834 Recovering log #68
+2024/09/15-12:15:54.199 4834 Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000068.log 
+2024/09/15-12:15:55.588 4834 Level-0 table #73: started
+2024/09/15-12:15:55.608 4834 Level-0 table #73: 1034407 bytes OK
+2024/09/15-12:15:55.611 4834 Delete type=0 #68
+2024/09/15-12:15:55.611 4834 Manual compaction at level-0 from '\x00(\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00)\x00\x00\x00' @ 0 : 0; will stop at (end)
+2024/09/15-12:15:56.733 24cc Compacting 1@1 + 1@2 files
+2024/09/15-12:15:56.772 24cc Generated table #74@1: 29476 keys, 1105319 bytes
+2024/09/15-12:15:56.773 24cc Compacted 1@1 + 1@2 files => 1105319 bytes
+2024/09/15-12:15:56.775 24cc compacted to: files[ 0 0 1 0 0 0 0 ]
+2024/09/15-12:15:56.775 24cc Delete type=2 #70
+2024/09/15-12:15:56.776 24cc Delete type=2 #73

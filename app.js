@@ -15,6 +15,7 @@ const ip=require('./route/ipRoute');
 const autoreply=require('./route/autoreplyRoute');
 const apiRoute=require('./route/apiRoute');
 const http = require('http');
+const autExpirePlan=require('./controler/autocheckPlan')
 const mediaRoute=require('./controler/mediaRoute')
 require('dotenv').config();
 

@@ -429,14 +429,15 @@ const getFreePlan = async (req, res) => {
             return res.status(400).json({ message: 'Invalid token.' });
         }
 
-        const result = await freeTrailCollection.findOne({ username: decoded.number });
-        if (result) {
+        const result = await soldPlanCollection.findOne({ username: decoded.number });
+        const userResult=await freeTrailCollection.findOne({username:decoded.number})
+        if (userResult) {
             return res.status(400).json({ message: "Your free trail session is expired" })
         }
-        const username=decoded.number;
+        const username = decoded.number;
         const userInfo = {
             username: decoded.number,
-            date:new Date()
+            date: new Date()
         }
         const plan = await collection.findOne({ type: "free" });
         await soldPlanCollection.updateOne(
@@ -444,6 +445,8 @@ const getFreePlan = async (req, res) => {
             { $push: { plans: { planId: plan._id, plan: plan, timestamp: new Date() } } }, // Add the message object to the existing messages array
             { upsert: true } // Create the document if it doesn't exist
         );
+
+        await freeTrailCollection.insertOne(userInfo);
 
         res.status(200).json({ message: "Plan Updated" });
     } catch (error) {
