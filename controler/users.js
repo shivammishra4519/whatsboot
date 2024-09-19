@@ -202,4 +202,32 @@ const getAllUser = async (req, res) => {
   }
 }
 
-module.exports = { userRegistration, login, adminregister, checkRole, logout,getAllUser };
+
+const getSessionsDetails = async (req, res) => {
+  try {
+    const authHeader = req.header('Authorization');
+    const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
+
+    if (!token) {
+      return res.status(401).json({ message: 'Access denied. No token provided.' });
+    }
+
+    // Verify the token
+    const secretKey = process.env.JWT_SECRET || 'whatsapp'; // Use an environment variable for the secret key
+    let decoded;
+    try {
+      decoded = jwt.verify(token, secretKey);
+    } catch (err) {
+      return res.status(400).json({ message: 'Invalid token.' });
+    }
+    const db = getDB();
+    const collection = db.collection('sessions');
+
+    const session = await collection.findOne({sessionId:decoded.number});
+    res.status(200).json(session)
+    
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+module.exports = { userRegistration, login, adminregister, checkRole, logout,getAllUser,getSessionsDetails };

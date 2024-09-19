@@ -118,7 +118,7 @@ const loginWhatsapp = async (req, res) => {
                 const db = getDB();
                 await db.collection('sessions').updateOne(
                     { sessionId },
-                    { $set: { status: 'ready' ,username:pushName,platform,userId} },
+                    { $set: { status: 'connected' ,username:pushName,platform,userId} },
                     { upsert: true }
                 );
                 sessions[sessionId] = client;
