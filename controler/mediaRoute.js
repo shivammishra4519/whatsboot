@@ -8,11 +8,19 @@ require('dotenv').config();
 
 const router = express.Router();
 
-// Configure multer to store files in memory
-const storage = multer.memoryStorage(); // Use memory storage instead of disk storage
-const upload = multer({ storage: storage }); // Use the memory storage configuration
-
-const sessionsArray = sessions;
+// Configure multer to store files on disk instead of memory
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');  // Specify a directory to save uploaded files
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ 
+    storage: storage, 
+    limits: { fileSize: 16 * 1024 * 1024 } // Limit to 16 MB
+});
 
 // Endpoint to send media
 router.post('/send-media', upload.single('file'), async (req, res) => {
@@ -35,7 +43,6 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
             return res.status(400).json({ message: 'Invalid token.' });
         }
 
-        // Extract data from request
         const { number, caption } = req.body;
         const file = req.file;
 
@@ -43,27 +50,22 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
             return res.status(400).json({ message: 'Required parameters are missing.' });
         }
 
-        // Check if the media file is too large
-        const maxSize = 16 * 1024 * 1024; // 16 MB
-        if (file.size > maxSize) {
-            return res.status(400).json({ message: 'File size exceeds the 16 MB limit.' });
-        }
+        // File path for the uploaded file
+        const filePath = file.path;
+        const media = MessageMedia.fromFilePath(filePath);
 
         const db = getDB();
         const messageCollection = db.collection('sendedmessages');
 
         const ip = req.ip.replace(/^::ffff:/, '');
         const sessionId = decoded.number;
-        const client = sessionsArray[sessionId];
+        const client = sessions[sessionId];
 
         if (!client) {
             return res.status(404).json({ error: 'Session not found or not authenticated.' });
         }
 
         const to = `91${number}@c.us`;
-
-        // Prepare the media in memory (convert the buffer into MessageMedia)
-        const media = new MessageMedia(file.mimetype, file.buffer.toString('base64'), file.originalname);
 
         console.log('Sending media:', {
             to,
@@ -84,6 +86,10 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
             { $push: { messages: { to, media: file.originalname, caption, timestamp: new Date(), ip } } },
             { upsert: true }
         );
+
+        // Optionally, delete the file after sending
+        const fs = require('fs');
+        fs.unlinkSync(filePath); // Delete the file after it's sent
 
         return res.status(200).json({ success: true, response });
     } catch (error) {
