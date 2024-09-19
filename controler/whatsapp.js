@@ -8,7 +8,18 @@ const { getDB } = require('../dbConnection'); // Assuming you have a db.js file 
 const sessions = {};
 
 
+const deleteSessionFolder = async (sessionId) => {
+    //     try {
+    //         const sessionPath = path.join(__dirname, 'sessions', sessionId);
+    //         console.log(`Deleting folder at path: ${sessionPath}`);
+    //   // Remove the folder and its contents
+    //   await fs.rm(sessionPath, { recursive: true, force: true });
 
+    //   console.log(`Folder deleted successfully: ${sessionPath}`);
+    // } catch (error) {
+    //   console.error(`Error deleting folder: ${error.message}`);
+    // }
+};
 
 const loginWhatsapp = async (req, res) => {
     try {
@@ -55,7 +66,7 @@ const loginWhatsapp = async (req, res) => {
 
         client.on('qr', async (qr) => {
             console.log('QR Code received', qr);
-            console.log('sessions',sessions)
+            console.log("sessions",sessions)
             const qrCodeImagePath = path.join(sessionPath, `${sessionId}.png`);
 
             try {
