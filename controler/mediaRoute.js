@@ -44,7 +44,7 @@ router.post('/send-media', upload.single('file'), async (req, res) => {
         }
 
         const { number, caption } = req.body;
-        console.log(caption);
+        console.log('caption',req.body);
         const file = req.file;
 
         if (!number || !file) {
