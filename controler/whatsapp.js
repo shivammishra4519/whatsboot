@@ -20,6 +20,16 @@ const deleteSessionFolder = async (sessionId) => {
     //   console.error(`Error deleting folder: ${error.message}`);
     // }
 };
+const deleteUserSessionFiles = (userId) => {
+    const userSessionPath = path.join(__dirname, 'sessions', userId);
+    
+    if (fs.existsSync(userSessionPath)) {
+        fs.rmdirSync(userSessionPath, { recursive: true });
+        console.log(`Deleted session files for user ${userId}.`);
+    } else {
+        console.log(`No session files found for user ${userId}.`);
+    }
+};
 
 const loginWhatsapp = async (req, res) => {
     try {
@@ -40,6 +50,16 @@ const loginWhatsapp = async (req, res) => {
         }
 
         const sessionId = decoded.number;
+        const deleteUserSessionFiles = (userId) => {
+            const userSessionPath = path.join(__dirname, 'sessions', sessionId);
+            
+            if (fs.existsSync(userSessionPath)) {
+                fs.rmdirSync(userSessionPath, { recursive: true });
+                console.log(`Deleted session files for user ${userId}.`);
+            } else {
+                console.log(`No session files found for user ${userId}.`);
+            }
+        };
         console.log(`Session ID: ${sessionId}`);
         if (!sessionId) {
             return res.status(400).json({ error: 'sessionId is required' });
