@@ -113,11 +113,12 @@ const loginWhatsapp = async (req, res) => {
             console.log('User ID:', userId);
             console.log('User Name:', pushName);
             console.log('Platform:', platform);
+            
             try {
                 const db = getDB();
                 await db.collection('sessions').updateOne(
                     { sessionId },
-                    { $set: { status: 'ready' } },
+                    { $set: { status: 'ready' ,username:pushName,platform,userId} },
                     { upsert: true }
                 );
                 sessions[sessionId] = client;
@@ -266,7 +267,22 @@ const sendMessage = async (req, res) => {
 
 const isLoggedIn = async (req, res) => {
     try {
-        const { sessionId } = req.body;
+        const authHeader = req.header('Authorization');
+        const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
+
+        if (!token) {
+            return res.status(401).json({ message: 'Access denied. No token provided.' });
+        }
+
+        const secretKey = process.env.JWT_SECRET || 'whatsapp';
+        let decoded;
+        try {
+            decoded = jwt.verify(token, secretKey);
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({ message: 'Invalid token.' });
+        }
+        const  sessionId = decoded.number;
         console.log(`Checking session ID: ${sessionId}`);
 
         if (!sessionId) {

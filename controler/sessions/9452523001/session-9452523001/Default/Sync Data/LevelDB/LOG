@@ -1,3 +1,2 @@
-2024/09/19-16:38:59.176 3a68 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Sync Data\LevelDB/MANIFEST-000001
-2024/09/19-16:38:59.177 3a68 Recovering log #3
-2024/09/19-16:38:59.177 3a68 Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Sync Data\LevelDB/000003.log 
+2024/09/19-18:54:22.344 27b0 Creating DB E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Sync Data\LevelDB since it was missing.
+2024/09/19-18:54:22.371 27b0 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Sync Data\LevelDB/MANIFEST-000001

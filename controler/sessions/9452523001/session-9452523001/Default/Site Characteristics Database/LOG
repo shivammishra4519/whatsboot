@@ -1,3 +1,2 @@
-2024/09/19-16:38:59.181 be0 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Site Characteristics Database/MANIFEST-000001
-2024/09/19-16:38:59.182 be0 Recovering log #3
-2024/09/19-16:38:59.182 be0 Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Site Characteristics Database/000003.log 
+2024/09/19-18:54:22.353 220c Creating DB E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Site Characteristics Database since it was missing.
+2024/09/19-18:54:22.385 220c Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Site Characteristics Database/MANIFEST-000001

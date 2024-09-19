@@ -1,3 +1,2 @@
-2024/09/19-16:38:59.237 3b5c Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Local Storage\leveldb/MANIFEST-000001
-2024/09/19-16:38:59.244 3b5c Recovering log #11
-2024/09/19-16:38:59.246 3b5c Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Local Storage\leveldb/000011.log 
+2024/09/19-18:54:22.411 4384 Creating DB E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Local Storage\leveldb since it was missing.
+2024/09/19-18:54:22.485 4384 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Local Storage\leveldb/MANIFEST-000001
