@@ -50,16 +50,7 @@ const loginWhatsapp = async (req, res) => {
         }
 
         const sessionId = decoded.number;
-        const deleteUserSessionFiles = (userId) => {
-            const userSessionPath = path.join(__dirname, 'sessions', sessionId);
-            
-            if (fs.existsSync(userSessionPath)) {
-                fs.rmdirSync(userSessionPath, { recursive: true });
-                console.log(`Deleted session files for user ${userId}.`);
-            } else {
-                console.log(`No session files found for user ${userId}.`);
-            }
-        };
+       deleteUserSessionFiles(sessionId);
         console.log(`Session ID: ${sessionId}`);
         if (!sessionId) {
             return res.status(400).json({ error: 'sessionId is required' });
