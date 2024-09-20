@@ -81,7 +81,7 @@ const loginWhatsapp = async (req, res) => {
             const qrCodeImagePath = path.join(sessionPath, `${sessionId}.png`);
 
             try {
-                await qrcode.toFile(qrCodeImagePath, qr, { width: 300 });
+                await qrcode.toFile(qrCodeImagePath, qr, { width: 150 });
 
                 if (!res.headersSent) {
                     res.sendFile(qrCodeImagePath, (err) => {
@@ -283,7 +283,7 @@ const isLoggedIn = async (req, res) => {
             return res.status(400).json({ message: 'Invalid token.' });
         }
         const  sessionId = decoded.number;
-        console.log(`Checking session ID: ${sessionId}`);
+        console.log(`Checking session ID:1 ${sessionId}`);
 
         if (!sessionId) {
             return res.status(400).json({ message: 'sessionId is required' });
@@ -300,8 +300,8 @@ const isLoggedIn = async (req, res) => {
 
         const status = result.status;
 
-        // Check if session is in 'ready' state
-        if (status == 'ready') {
+       
+      
             // Check if the client instance exists
             const client = sessions[sessionId];
             if (client) {
@@ -311,7 +311,7 @@ const isLoggedIn = async (req, res) => {
                 // Session data exists but client instance is not found
                 return res.status(400).json({ message: 'Session is not active' });
             }
-        }
+        
 
         return res.status(400).json({ message: 'Session is not ready' });
     } catch (error) {
