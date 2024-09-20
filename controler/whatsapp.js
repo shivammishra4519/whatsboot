@@ -4,7 +4,9 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const jwt = require('jsonwebtoken');
 const qrcode = require('qrcode');
 const { getDB } = require('../dbConnection'); // Assuming you have a db.js file for MongoDB connection
+require('dotenv').config();
 
+const executablePath = process.env.executablePath;
 const sessions = {};
 
 
@@ -69,8 +71,8 @@ const loginWhatsapp = async (req, res) => {
                 clientId: sessionId,
                 dataPath: sessionPath,
             }), puppeteer: {
-                //  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-                executablePath: '/usr/bin/google-chrome',
+                 executablePath,
+               
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             },
         });
@@ -209,9 +211,24 @@ const loginWhatsapp = async (req, res) => {
         
 
 
-        client.on('disconnected', reason => {
+        client.on('disconnected', async reason => {
             console.error(`Client disconnected: ${reason}`);
-            // Optionally, clean up session data here
+            const sessionId = client.authStrategy.clientId;
+            delete sessions[sessionId];
+            try {
+                const db = getDB();
+                await db.collection('sessions').updateOne(
+                    { sessionId },
+                    { $set: { status: 'disconnected'} },
+                    { upsert: true }
+                );
+                sessions[sessionId] = client;
+            } catch (error) {
+                console.error('Error updating session status:', error);
+                if (!res.headersSent) {
+                    res.status(500).json({ error: 'Failed to update session status' });
+                }
+            }
         });
 
         client.on('error', error => {
@@ -556,4 +573,98 @@ async function checkAnswer(to, msg) {
     }
 }
 
-module.exports = { loginWhatsapp, sendMessage, isLoggedIn, sendQuickMessage, sendQuickMessageMulti, sessions };
+
+
+const sessionRecover = async (req, res) => {
+    try {
+        const authHeader = req.header('Authorization');
+        const token = req.cookies.auth_token || (authHeader && authHeader.replace('Bearer ', ''));
+
+        if (!token) {
+            return res.status(401).json({ message: 'Access denied. No token provided.' });
+        }
+
+        const secretKey = process.env.JWT_SECRET || 'whatsapp';
+        let decoded;
+        try {
+            decoded = jwt.verify(token, secretKey);
+        } catch (err) {
+            console.error('Token verification failed:', err);
+            return res.status(400).json({ message: 'Invalid token.' });
+        }
+
+        const sessionId = decoded.number;
+
+        if (!sessionId) {
+            return res.status(400).json({ error: 'sessionId is required' });
+        }
+
+        const sessionPath = path.join(__dirname, 'sessions', sessionId);
+        if (!fs.existsSync(sessionPath)) {
+            fs.mkdirSync(sessionPath, { recursive: true });
+        }
+
+        const client = new Client({
+            authStrategy: new LocalAuth({
+                clientId: sessionId,
+                dataPath: sessionPath,
+            }),
+            puppeteer: {
+                executablePath,
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            },
+        });
+
+        let responseSent = false; // Track if a response has been sent
+
+        client.on('qr', async (qr) => {
+            return res.status(400).json({message:"Your session can not recover"})
+        });
+
+        client.on('ready', async () => {
+            console.log(`${sessionId} is ready!`);
+            const userId = client.info.wid._serialized;
+            const pushName = client.info.pushname;
+            const platform = client.info.platform;
+
+            console.log('Logged-in user details:', { userId, pushName, platform });
+            if (!responseSent) {
+                res.status(200).json({ message: `Session is ready for ${userId}` });
+                responseSent = true; // Mark response as sent
+            }
+
+            try {
+                const db = getDB();
+                await db.collection('sessions').updateOne(
+                    { sessionId },
+                    { $set: { status: 'connected', username: pushName, platform, userId } },
+                    { upsert: true }
+                );
+                sessions[sessionId] = client;
+            } catch (error) {
+                console.error('Error updating session status:', error);
+                if (!responseSent) {
+                    res.status(500).json({ error: 'Failed to update session status' });
+                }
+            }
+        });
+
+        // Other event handlers...
+
+        
+
+        client.on('error', (error) => {
+            console.error('Client encountered an error:', error);
+        });
+
+        client.initialize();
+    } catch (error) {
+        console.error('Error in sessionRecover:', error);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
+};
+
+
+module.exports = { loginWhatsapp, sendMessage, isLoggedIn, sendQuickMessage, sendQuickMessageMulti, sessions,sessionRecover };

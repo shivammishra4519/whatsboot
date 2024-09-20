@@ -1,2 +1,3 @@
-2024/09/20-14:13:37.385 2bbc Creating DB E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Session Storage since it was missing.
-2024/09/20-14:13:37.437 2bbc Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Session Storage/MANIFEST-000001
+2024/09/20-15:55:33.768 3f14 Reusing MANIFEST E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Session Storage/MANIFEST-000001
+2024/09/20-15:55:33.769 3f14 Recovering log #3
+2024/09/20-15:55:33.771 3f14 Reusing old log E:\whatsapp service\backend\controler\sessions\9452523001\session-9452523001\Default\Session Storage/000003.log 
