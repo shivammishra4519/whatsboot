@@ -91,7 +91,7 @@ const loginWhatsapp = async (req, res) => {
                 dataPath: sessionPath,
             }), puppeteer: {
                  executablePath,
-               headless:false,
+               headless:true,
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             },
         });
@@ -630,7 +630,7 @@ const sessionRecover = async (req, res) => {
             }),
             puppeteer: {
                 executablePath,
-                headless:false,
+                headless:true,
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             },
         });
