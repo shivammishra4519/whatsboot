@@ -22,12 +22,30 @@ const deleteSessionFolder = async (sessionId) => {
     //   console.error(`Error deleting folder: ${error.message}`);
     // }
 };
+const deleteWithRetry = (filePath, retries = 5, delay = 1000) => {
+    if (retries === 0) {
+        console.error(`Failed to delete: ${filePath} after multiple attempts`);
+        return;
+    }
+
+    try {
+        fs.rmSync(filePath, { recursive: true, force: true });
+        console.log(`Deleted session files at: ${filePath}`);
+    } catch (err) {
+        if (err.code === 'EPERM') {
+            console.log(`File in use, retrying in ${delay / 1000} seconds...`);
+            setTimeout(() => deleteWithRetry(filePath, retries - 1, delay), delay);
+        } else {
+            console.error(`Error deleting session files:`, err);
+        }
+    }
+};
+
 const deleteUserSessionFiles = (userId) => {
     const userSessionPath = path.join(__dirname, 'sessions', userId);
-    
+
     if (fs.existsSync(userSessionPath)) {
-        fs.rmdirSync(userSessionPath, { recursive: true });
-        console.log(`Deleted session files for user ${userId}.`);
+        deleteWithRetry(userSessionPath);
     } else {
         console.log(`No session files found for user ${userId}.`);
     }
@@ -53,6 +71,7 @@ const loginWhatsapp = async (req, res) => {
 
         const sessionId = decoded.number;
        deleteUserSessionFiles(sessionId);
+       delete sessions[sessionId];
         console.log(`Session ID: ${sessionId}`);
         if (!sessionId) {
             return res.status(400).json({ error: 'sessionId is required' });
@@ -72,7 +91,7 @@ const loginWhatsapp = async (req, res) => {
                 dataPath: sessionPath,
             }), puppeteer: {
                  executablePath,
-               
+               headless:false,
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             },
         });
@@ -611,6 +630,7 @@ const sessionRecover = async (req, res) => {
             }),
             puppeteer: {
                 executablePath,
+                headless:false,
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             },
         });
@@ -618,6 +638,7 @@ const sessionRecover = async (req, res) => {
         let responseSent = false; // Track if a response has been sent
 
         client.on('qr', async (qr) => {
+            console.log(qr)
             return res.status(400).json({message:"Your session can not recover"})
         });
 

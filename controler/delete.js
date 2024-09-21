@@ -4,7 +4,7 @@ const path = require('path');
 const deleteFolder = async () => {
     try {
         // Define the path to the '9335792497' folder
-        const folderPath = path.join(__dirname, 'sessions', '9198899433');
+        const folderPath = path.join(__dirname, 'sessions', '9452523001');
 
         // Remove the folder and its contents
         await fs.rm(folderPath, { recursive: true, force: true }, (error) => {
