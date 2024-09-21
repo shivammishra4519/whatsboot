@@ -29,6 +29,8 @@ const sendSingleMessage = async (req, res) => {
             return res.status(400).json({ message: "Invalid token" });
         }
 
+        console.log("req ip begfore",req.ip)
+
         const ip = req.ip.replace(/^::ffff:/, "");
         const decodedData = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
         console.log("req ip",ip)
