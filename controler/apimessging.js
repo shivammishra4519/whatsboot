@@ -31,7 +31,8 @@ const sendSingleMessage = async (req, res) => {
 
         const ip = req.ip.replace(/^::ffff:/, "");
         const decodedData = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
-        
+        console.log("req ip",ip)
+        console.log("db ip",decodedData.ip)
         if (ip !== decodedData.ip) {
             return res.status(400).json({ message: "IP is not listed" });
         }
