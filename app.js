@@ -55,7 +55,7 @@ app.use('/api',mediaRoute);
  
 app.get('/',(req,res)=>{
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  
+  console.log("i[p",ip)
   res.send('Hello World');
 })
 
