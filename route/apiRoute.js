@@ -3,7 +3,7 @@ const { sendSingleMessage} = require('../controler/apimessging'); // Ensure the 
 
 const router = express.Router();
 
-router.post('/single/message', sendSingleMessage);
+router.get('/single/message', sendSingleMessage);
 
 
 
