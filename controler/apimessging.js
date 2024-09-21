@@ -31,7 +31,8 @@ const sendSingleMessage = async (req, res) => {
 
         console.log("req ip begfore",req.ip)
 
-        const ip = req.ip.replace(/^::ffff:/, "");
+        // const ip = req.ip.replace(/^::ffff:/, "");
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
         const decodedData = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
         console.log("req ip",ip)
         console.log("db ip",decodedData.ip)
