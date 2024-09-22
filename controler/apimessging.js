@@ -20,6 +20,12 @@ const sendSingleMessage = async (req, res) => {
             return res.status(400).json({ message: "Required parameters are missing" });
         }
 
+        // Validate that the number is a valid 10-digit number
+        const numberPattern = /^\d{10}$/;
+        if (!numberPattern.test(number)) {
+            return res.status(400).json({ message: "Invalid phone number. It should be 10 digits." });
+        }
+
         const db = getDB();
         const tokenCollection = db.collection('ipTokens');
         const messageCollection = db.collection('sendedmessages');
@@ -29,14 +35,13 @@ const sendSingleMessage = async (req, res) => {
             return res.status(400).json({ message: "Invalid token" });
         }
 
-        console.log("req ip begfore",req.ip)
+        console.log("req ip before", req.ip);
 
-      
         const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
         const ip1 = ip.replace(/^::ffff:/, "");
         const decodedData = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
-        console.log("req ip",ip1)
-        console.log("db ip",decodedData.ip)
+        console.log("req ip", ip1);
+        console.log("db ip", decodedData.ip);
         if (ip1 !== decodedData.ip) {
             return res.status(400).json({ message: "IP is not listed" });
         }
@@ -80,6 +85,7 @@ const sendSingleMessage = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 
 
